@@ -29,11 +29,6 @@ const trackWhatJetpackSyncView = () => analytics.tracks.recordJetpackClick( {
 	feature: 'privacy'
 } );
 
-const trackPrivacyBlogView = () => analytics.tracks.recordJetpackClick( {
-	target: 'privacy-blog',
-	feature: 'privacy'
-} );
-
 class Privacy extends React.Component {
 	static displayName = 'PrivacySettings';
 
@@ -54,10 +49,30 @@ class Privacy extends React.Component {
 		active: false,
 	};
 
+	isPrivacyFound = () => {
+		if ( this.props.searchTerm ) {
+			return (
+				[
+					__( 'privacy', { context: 'Search term.' } ),
+					__( 'tracks', { context: 'Search term.' } ),
+					__( 'data', { context: 'Search term.' } ),
+					__( 'gdpr', { context: 'Search term.' } ),
+					__( 'tos', { context: 'Search term.' } ),
+					__( 'terms of service', { context: 'Search term.' } ),
+				]
+					.join( ' ' )
+					.toLowerCase()
+					.indexOf( this.props.searchTerm.toLowerCase() ) > -1
+			);
+		}
+
+		return true;
+	};
+
 	togglePrivacy = () => {
 		const current = this.props.trackingSettings.tracks_opt_out;
 		this.props.setTrackingSettings( ! current );
-	}
+	};
 
 	componentWillMount() {
 		this.props.fetchTrackingSettings();
@@ -73,7 +88,7 @@ class Privacy extends React.Component {
 			return null;
 		}
 
-		return (
+		return this.isPrivacyFound() && (
 			<div>
 				<SettingsCard
 					{ ...this.props }
@@ -113,19 +128,6 @@ class Privacy extends React.Component {
 								id="privacy-settings">
 								{ __( 'Send information to help us improve our products.' ) }
 							</CompactFormToggle>
-						</p>
-						<p>
-							{ __(
-								'See more WordPress privacy information and resources on {{a}}privacy.blog{{/a}}.', {
-									components: {
-										a: <ExternalLink
-											href="https://privacy.blog/"
-											onClick={ trackPrivacyBlogView }
-											target="_blank" rel="noopener noreferrer"
-										/>
-									}
-								} )
-							}
 						</p>
 					</SettingsGroup>
 				</SettingsCard>
